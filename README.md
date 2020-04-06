@@ -17,4 +17,5 @@ To make this essentially animation to work I used the Processing5 - Framework (h
 ## License
 
 Further information to use p5 are here. (https://p5js.org/copyright.html)
+
 This project stands under the GNU Lesser General Public License v2.1 (more in LICENSE)
