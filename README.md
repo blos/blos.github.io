@@ -1,6 +1,7 @@
 # Infection Simulation (non-scinetific)
 
-This is my approach to illustrate a spreading infection WITH reinfection of the healthy ones
+This is my approach to illustrate a spreading infection WITH reinfection of the healthy ones.
+You can download the stats after the number of infected turns to 0 or when there were 15.000 frames render.
 
 ## Getting Started
 
