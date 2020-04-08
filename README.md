@@ -1,4 +1,4 @@
-# Infection Simulation (non-scinetific)
+# Infection Simulation (non-scientific)
 
 This is my approach to illustrate a spreading infection WITH reinfection of the healthy ones.
 You can download the stats after the number of infected turns to 0 or when there were 15.000 frames rendered.
