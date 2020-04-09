@@ -4,15 +4,20 @@
 //       x ,  y
 const SIZE = [500, 500];
 
-const NUM = 500;      //number of objects which will be generated, be carefull here
-const LEN = 4;        //size of each object
-const DAMPING = 1.5;  //moving speed
+const NUM = 2000;          //number of objects which will be generated, be carefull here
+const LEN = 4;             //size of each object
+const MOVING_SPEED = 1.5;  //moving speed
+
 
 const HEAL_RANGE = 15;   //range of HEAL-time
 const HEAL_OFFSET = 1.5; //start of the range of HEAL time
 
 const INIT_INFECTED = 1;       //amount of initial inected objects
 const REINFECTION_POT = .05;   //probability of getting reINFECTED when HEALthy
+
+const DEATH_POT = .5;       //probability of an objects death
+const SKIP_DEATH_POLL = 5;  //this does determine how many frames will be skipped until
+                            //the next death of an obeject will be determined
 /* UNTIL HERE */
 
 
@@ -68,8 +73,8 @@ function setup() {
     POSX[i] = SPAWN_OFFSET + Math.floor((SIZE[0] - 2 * SPAWN_OFFSET) * random());
     POSY[i] = SPAWN_OFFSET + Math.floor((SIZE[1] - 2 * SPAWN_OFFSET) * random());
     //random velocity for the objects
-    VELX[i] = dirx * random() * DAMPING;
-    VELY[i] = diry * random() * DAMPING;
+    VELX[i] = dirx * random() * MOVING_SPEED;
+    VELY[i] = diry * random() * MOVING_SPEED;
     //determines which time every object need to HEAL
     HEAL[i] = HEAL_OFFSET + Math.round(random(1, HEAL_RANGE));
     //initializing every object as unINFECTED
@@ -86,6 +91,7 @@ function setup() {
   COUNT_INF = INIT_INFECTED;
   COUNT_UNINF = NUM - COUNT_INF;
 
+  //setting up the first frame time
   TIME_CURR = TIME_START;
 
 }
@@ -95,7 +101,7 @@ function draw() {
 
   //some vars which will be updated every frame
   FC = frameCount;
-  FT = new Date() - TIME_CURR; //updates every 20 frames the FT-counter
+  FT = new Date() - TIME_CURR; //updates every frame the FT-counter
   TIME_CURR = new Date();
   SECONDS = (new Date() - TIME_START) / 1000;
 
@@ -136,13 +142,7 @@ function draw() {
       if (touch(i, j)) {
 
         //handles the interaction with dead objects and not-dead objects
-        if (COLORS[i] == 3) {
-          //invertVel(j);
-          continue;
-        } else if (COLORS[j] == 3) {
-          //invertVel(i);
-          continue;
-        }
+        if (COLORS[i] == 3 || COLORS[j] == 3) continue;
 
         //then swap their velocities
         swapVel(i, j);
@@ -152,7 +152,6 @@ function draw() {
         //its a small optimization which should not have that big impact
         if (COLORS[i] == 1 && COLORS[j] == 1) continue;
         if (COLORS[i] == 2 && COLORS[j] == 2) continue;
-        if (COLORS[i] == 3 && COLORS[j] == 3) continue;
 
         //this makes reinfaction of HEALthy object possible
         //by generating a random number and checking if that number
@@ -164,6 +163,7 @@ function draw() {
             INFECTED[i] = SECONDS;
             COUNT_HEALTHY--;  //decreace healthy count
             COUNT_INF++;      //increace infected count
+            
           }
         }
         //same as directly above but reversed rolles
@@ -175,6 +175,7 @@ function draw() {
             INFECTED[j] = SECONDS;
             COUNT_HEALTHY--;  //decreace healthy count
             COUNT_INF++;      //increace infected count
+            
           }
         }
 
@@ -185,6 +186,7 @@ function draw() {
           INFECTED[j] = SECONDS;
           COUNT_UNINF--;
           COUNT_INF++;
+          
         }
         //same as directly above but reversed rolles
         //should not be necessary
@@ -212,13 +214,15 @@ function draw() {
   //the idea is that every INFECTED object can die
   //so a random number from all will be selected and if it is
   //INFECTED, this object dies
-  let tmp = Math.round(random(1, NUM));
-  if (COLORS[tmp] == 1) {
-    COLORS[tmp] = 3;
-    VELX[tmp] = 0;
-    VELY[tmp] = 0;
-    COUNT_INF--;
-    COUNT_DEAD++;
+  if (FC % SKIP_DEATH_POLL == 0) {
+    let tmp = Math.round(random(1, NUM));
+    if (COLORS[tmp] == 1 && random() < DEATH_POT) {
+      COLORS[tmp] = 3;
+      VELX[tmp] = 0;
+      VELY[tmp] = 0;
+      COUNT_INF--;
+      COUNT_DEAD++;
+    }
   }
 
   //status output for basic render observation
@@ -253,7 +257,7 @@ function draw() {
     let saveOut = { TIME: XS, UNINF: SAVE_UNINF, INF: SAVE_INF, HEALTHY: SAVE_HEALTH, DEAD: SAVE_DEAD };
     //saving into a json-file
     let saveName = new Date();
-    saveJSON(saveOut, 'simulation_export_' + saveName.getFullYear() + '_' + (saveName.getMonth() + 1) + '_' + saveName.getDate() + '_' + '.json', true);
+    saveJSON(saveOut, 'simulation_export_' + saveName.getFullYear() + '_' + (saveName.getMonth() + 1) + '_' + saveName.getDate() + '.json', true);
   }
 
 }
