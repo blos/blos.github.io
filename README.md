@@ -7,10 +7,6 @@ You can download the stats after the number of infected turns to 0 or when there
 
 Just download the files and open the 'index.html'-file with a browser.
 
-### Prerequisites
-
-none
-
 ## Contributing
 
 To make this essentially animation to work I used the Processing5 - Framework (https://p5js.org/)
